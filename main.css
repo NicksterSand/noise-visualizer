@@ -1,0 +1,10 @@
+label{
+    float:left;
+    width:30px;
+}
+input[type=range]{
+    margin-left:30px;
+}
+#controls{
+    width:256px;
+}
