@@ -7,12 +7,12 @@ function main() {
         return;
     }
 
-    const defaultShader = initShaderProgram(gl, vsSourceDefault, fsSourceVoronoi);
-    const buffers = initBuffers(gl);
-    const uScreenSize = gl.getUniformLocation(defaultShader,"uScreenSize");
-    const uSeed = gl.getUniformLocation(defaultShader,"uSeed");
-    const uScale = gl.getUniformLocation(defaultShader,"uScale");
-    const uColor = gl.getUniformLocation(defaultShader,"uColor");
+    let defaultShader = initShaderProgram(gl, vsSourceDefault, fsSourceVoronoi);
+    let buffers = initBuffers(gl);
+    let uScreenSize = gl.getUniformLocation(defaultShader,"uScreenSize");
+    let uSeed = gl.getUniformLocation(defaultShader,"uSeed");
+    let uScale = gl.getUniformLocation(defaultShader,"uScale");
+    let uColor = gl.getUniformLocation(defaultShader,"uColor");
     gl.useProgram(defaultShader);
     gl.uniform2f(uScreenSize,canvas.width,canvas.height);
     gl.uniform4f(uSeed, Math.random() * 200 + 50,Math.random() * 200 + 50,Math.random() * 200 + 50,Math.random() * 200 + 50);    gl.uniform1f(uScale, 20);
@@ -32,16 +32,37 @@ function main() {
         gl.useProgram(defaultShader);
         gl.uniform1f(uScale, noiseScale.value);
     }
+
     document.getElementById("seed").onclick = function(){
         gl.useProgram(defaultShader);
         gl.uniform4f(uSeed, Math.random() * 200 + 50,Math.random() * 200 + 50,Math.random() * 200 + 50,Math.random() * 200 + 50);
     }
+    $(".nodeSelect").change(function(){
+        const val = $(this).val();
+        let source = fsSourceDefault;
+        if(val == "value") {
+            source = fsSourceValue;
+        }else if(val == "worley"){
+            source = fsSourceVoronoi;
+        }else if(val == "perlin"){
+            source = fsSourcePerlin;
+        }
+        defaultShader = initShaderProgram(gl, vsSourceDefault, source);
+        uScreenSize = gl.getUniformLocation(defaultShader,"uScreenSize");
+        uSeed = gl.getUniformLocation(defaultShader,"uSeed");
+        uScale = gl.getUniformLocation(defaultShader,"uScale");
+        uColor = gl.getUniformLocation(defaultShader,"uColor");
+        gl.useProgram(defaultShader);
+        gl.uniform2f(uScreenSize,canvas.width,canvas.height);
+        gl.uniform4f(uSeed, Math.random() * 200 + 50,Math.random() * 200 + 50,Math.random() * 200 + 50,Math.random() * 200 + 50);    gl.uniform1f(uScale, 20);
+        gl.uniform3f(uColor, noiseR.value, noiseG.value, noiseB.value);
+        gl.uniform1f(uScale, noiseScale.value);
+    });
     let then = 0;
     function render(now){
         now *= 0.001;
         const deltaTime = now-then;
         then = now;
-        update();
         drawScene(gl,defaultShader,buffers);
         requestAnimationFrame(render);
     }
@@ -105,14 +126,6 @@ function drawScene(gl, shaderProgram, buffers){
     }
     gl.useProgram(shaderProgram);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
-}
-
-function update(){
-
-}
-
-function randomize(){
-
 }
 
 window.onload = main;
