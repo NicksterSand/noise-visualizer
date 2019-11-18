@@ -4,18 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Noise Visualizer</title>
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
-    <script>
-        $( function() {
-            $( "#draggable" ).draggable();
-        } );
-    </script>
-    <script src="shaders.js"></script>
-    <script src="main.js"></script>
     <link rel="stylesheet" href="main.css">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous" defer></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous" defer></script>
+    <script src="graphics.js" defer></script>
+    <script src="main.js" defer></script>
 </head>
 <body>
+<div id="asideholder">
+    <aside>
+        <canvas id="mainCanvas" height="256" width="256"></canvas>
+    </aside>
+</div>
+<main>
+    <div class="testDiv">TEST</div>
+    <div class="testDiv">TEST2</div>
+</main>
+<!--
     <div id="draggable" class="ui-widget-content">
         <canvas id="glCanvas" height="256" width="256"></canvas><br>
         <div id="controls">
@@ -36,5 +41,6 @@
             <button id="seed">New Seed</button>
         </div>
     </div>
+    -->
 </body>
 </html>

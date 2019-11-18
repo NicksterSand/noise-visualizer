@@ -1,4 +1,29 @@
-button{
+body{margin:0;padding:0;overflow:hidden -moz-hidden-unscrollable;}
+#asideholder{
+    float:right;
+    width:266px;
+}
+aside{
+    height:100vh;
+    width:256px;
+    background-color: rgba(255, 0, 0, 0.64);
+    z-index: 1;
+    position:fixed;
+    padding:5px;
+}
+main{
+    width:120vw; height:120vh;
+    margin:  0; padding:  0;
+    background-image:url("img/tiledbg.png");
+}
+.testDiv{
+    background-color:red;
+    font-size:30px;
+    width:200px;
+}
+
+
+/*button{
     border-radius:5px;
     padding: 5px;
     background-color: #eeeeee;
@@ -29,4 +54,4 @@ select{
     padding:.1em 0;
     font-size:1em;
     margin-bottom:10px;
-}
+}*/
