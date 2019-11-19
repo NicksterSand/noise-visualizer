@@ -8,7 +8,7 @@ const vsSourceDefault = `
 `;
 const fsSourceDefault = `
     void main(){
-        gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+        gl_FragColor = vec4(0.0,0.0,0.0,1.0);
     }
 `;
 const fsSourcePerlin = `
@@ -47,7 +47,7 @@ const fsSourcePerlin = `
         gl_FragColor = vec4(color, 1.);
     }
 `;
-const fsSourceVoronoi = `
+const fsSourceWorley = `
     uniform lowp vec2 uScreenSize;
     uniform lowp vec4 uSeed;
     uniform lowp float uScale;
@@ -124,3 +124,63 @@ const fsSourceValue = `
         gl_FragColor = vec4(color, 1.);
     }
 `;
+
+function initShaderProgram(gl, vsSource, fsSource){
+    const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+    const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+    const shaderProgram = gl.createProgram();
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+
+    if(!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)){
+        alert("Could not initialize shader: " + gl.getProgramInfoLog(shaderProgram));
+        return null;
+    }
+
+    return shaderProgram;
+}
+
+function loadShader(gl, type, source) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+
+    if(!gl.getShaderParameter(shader, gl.COMPILE_STATUS)){
+        alert("Could not compile shader: " + gl.getShaderInfoLog(shader));
+        gl.deleteShader(shader);
+        return null;
+    }
+
+    return shader;
+}
+
+function initBuffers(gl){
+    const positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    //Create fullscreen quad
+    const positions = [
+        -1.0,  1.0,
+        1.0,  1.0,
+        -1.0, -1.0,
+        1.0, -1.0,
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+    return{
+        position: positionBuffer
+    };
+}
+
+function drawScene(gl, shaderProgram, buffers){
+    gl.clearColor(0.0,0.0,0.0,1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    {
+        const vertexPosition = gl.getAttribLocation(shaderProgram,"aVertexPosition");
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+        gl.vertexAttribPointer(vertexPosition,2,gl.FLOAT,false,0,0);
+        gl.enableVertexAttribArray(vertexPosition);
+    }
+    gl.useProgram(shaderProgram);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+}
