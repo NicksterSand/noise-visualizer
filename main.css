@@ -1,3 +1,19 @@
+#loadWheel{
+    //animation: rotation 2s infinite linear;
+    z-index: 100;
+    width:100%;
+    height:100%;
+    background-image:url("img/load.png");
+    background-repeat:no-repeat;
+    background-position: center;
+}
+#loadDiv{
+    width:100vw;
+    height:100vh;
+    position:fixed;
+    z-index: 99;
+    background-color:black;
+}
 body{margin:0;padding:0;overflow:hidden -moz-hidden-unscrollable;}
 #rightclick{
     position:absolute;
@@ -53,20 +69,46 @@ main{
     background-color:lightgrey;
     box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.45);
 }
-.draggable button{
+.draggable input[type=button]{
     border-radius:5px;
-    padding: 5px;
     background-color: #eeeeee;
     font-weight: bold;
     color:#333333;
+    float:right;
+    width:192px;
 }
-label{
+.draggable button{
+    width:12px;
+    height:12px;
+    padding: 0; margin:0;
+    position:relative;
+    background-color:green;
+    border:1px solid black;
+    border-radius:6px;
+}
+.draggable button:hover{
+    background-color: #00e600;
+}
+.input{
+    right:48px;
+    bottom:5px;
+}
+.output{
+    left:22px;
+    bottom:5px;
+}
+.draggable label{
     float:left;
     width:30px;
 }
-input[type=range]{
-    margin-left:30px;
+.draggable input[type=range]{
+    float:right;
     width:192px;
+}
+.outLabel{
+    width:240px;
+    text-align:right;
+    display:inline-block;
 }
 #controls{
     width:256px;

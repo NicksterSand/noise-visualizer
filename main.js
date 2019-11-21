@@ -58,29 +58,35 @@ $(function(){
         $(this).hide();
         $(this).prev().css("background-color", "grey");
     });
+
+    let nodes = [];
+    //Make Node
     $("#rightclick div button").click(function(event){
-        //TODO: condense others
+        if($("#activeNode").length){collapseNode($("#activeNode"),nodeGL)};
         const node = $(document.createElement('div'));
+        nodeObj={node:node, type:$(this).parent().attr("id")};
         node.attr("class","draggable");
         node.css("top", event.pageY + "px");
         node.css("left", event.pageX + "px");
         node.css("position","absolute");
         $("main").append(node);
-        switch($(this).parent().attr("id")){
+        switch(nodeObj.type){
             case "noise":
-                console.log("made noise node");
+                nodeObj.inputs = [0,0,0,0];
+                nodeObj.outputs = [0];
+                node.attr("id", "activeNode");
                 node.append("<canvas id='nodeCanvas' height='256' width='256'></canvas>" +
                     "<br><div id='controls'>" +
-                    "<p>"+ $(this).text() +"</p>" +
-                    "<label for='noiseR'>Red</label>\n" +
-                    "<input type='range' id='noiseR' step='0.005' min='0' max='1' value='1'><br>\n" +
-                    "<label for='noiseG'>Green</label>\n" +
-                    "<input type='range' id='noiseG' step='0.005' min='0' max='1' value='1'><br>\n" +
-                    "<label for='noiseB'>Blue</label>\n" +
-                    "<input type='range' id='noiseB' step='0.005' min='0' max='1' value='1'><br>\n" +
+                    "<p>"+ $(this).text() +" Noise</p>" +
+                    "<button id='scaleIn' class='input'></button>" +
                     "<label for='noiseScale'>Scale</label>\n" +
                     "<input type='range' min='0.5' max='100' id='noiseScale'><br>\n" +
-                    "<button id='seed'>New Seed</button>");
+                    "<br>" +
+                    "<button id='seedIn' class='input'></button>" +
+                    "<label for='seed'>Seed</label>\n" +
+                    "<input type='button' id='seed' value='New Seed'>" +
+                    "<p class='outLabel'>Noise</p>" +
+                    "<button id='noiseOut' class='output'></button>");
                     node.mousedown(function(event){if(event.which == 1){movingOne = true; moveObj = node}});
                     $("#controls input").on("input",function(){
                         moveObj = null;
@@ -101,17 +107,17 @@ $(function(){
                             alert($(this).text() + " has no linked source!");
                             break;
                     }
-                    nodeGL = initNodeCanvas(source);
+                    nodeGL = initNodeCanvas(node, source);
                     nodeGL.gl.useProgram(nodeGL.shader);
-                    let uColor = nodeGL.gl.getUniformLocation(nodeGL.shader, "uColor");
+                    //let uColor = nodeGL.gl.getUniformLocation(nodeGL.shader, "uColor");
                     let uSeed = nodeGL.gl.getUniformLocation(nodeGL.shader, "uSeed");
                     let uScale = nodeGL.gl.getUniformLocation(nodeGL.shader, "uScale");
                     let uScreenSize = nodeGL.gl.getUniformLocation(nodeGL.shader, "uScreenSize");
-                    nodeGL.gl.uniform3f(uColor, $("#noiseR").val(), $("#noiseG").val(), $("#noiseB").val());
-                    $("#noiseR, #noiseG, #noiseB").on("input", function(){
-                        nodeGL.gl.useProgram(nodeGL.shader);
-                        nodeGL.gl.uniform3f(uColor, $("#noiseR").val(), $("#noiseG").val(), $("#noiseB").val());
-                    });
+                    // nodeGL.gl.uniform3f(uColor, $("#noiseR").val(), $("#noiseG").val(), $("#noiseB").val());
+                    // $("#noiseR, #noiseG, #noiseB").on("input", function(){
+                    //     nodeGL.gl.useProgram(nodeGL.shader);
+                    //     nodeGL.gl.uniform3f(uColor, $("#noiseR").val(), $("#noiseG").val(), $("#noiseB").val());
+                    // });
                     nodeGL.gl.uniform4f(uSeed, Math.random() * 200 + 50,Math.random() * 200 + 50,Math.random() * 200 + 50,Math.random() * 200 + 50);
                     $("#seed").click(function(){
                         nodeGL.gl.useProgram(nodeGL.shader);
@@ -127,6 +133,7 @@ $(function(){
             default:
                 break;
         }
+        nodes.push(nodeObj);
     });
     $("body").click(function(event) {
         if (rightClickMenu){
@@ -146,6 +153,8 @@ $(function(){
     const mainBuffers = initBuffers(mainGL);
     mainGL.useProgram(mainShader);
 
+
+    setInterval(function(){$("#loadDiv").remove()}, 100);
     //Render Loop
     let then = 0;
     function render(now){
@@ -160,9 +169,9 @@ $(function(){
     }
     requestAnimationFrame(render);
 });
-function initNodeCanvas(fsSource){
-    const canvas = $("#nodeCanvas").get(0);
-    const gl = canvas.getContext("webgl");
+function initNodeCanvas(node, fsSource){
+    const canvas = node.find("#nodeCanvas")[0];
+    const gl = canvas.getContext("webgl", {preserveDrawingBuffer: true});
     if(gl == null){
         alert("Could not initialize WebGL");
         return;
@@ -177,59 +186,14 @@ function initNodeCanvas(fsSource){
         buffers:buffers
     }
 }
-function initShaderProgram(gl, vsSource, fsSource){
-    const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
-    const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
-
-    const shaderProgram = gl.createProgram();
-    gl.attachShader(shaderProgram, vertexShader);
-    gl.attachShader(shaderProgram, fragmentShader);
-    gl.linkProgram(shaderProgram);
-
-    if(!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)){
-        alert("Could not initialize shader: " + gl.getProgramInfoLog(shaderProgram));
-        return null;
-    }
-
-    return shaderProgram;
-}
-function loadShader(gl, type, source) {
-    const shader = gl.createShader(type);
-    gl.shaderSource(shader, source);
-    gl.compileShader(shader);
-
-    if(!gl.getShaderParameter(shader, gl.COMPILE_STATUS)){
-        alert("Could not compile shader: " + gl.getShaderInfoLog(shader));
-        gl.deleteShader(shader);
-        return null;
-    }
-
-    return shader;
-}
-function initBuffers(gl){
-    const positionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    //Create fullscreen quad
-    const positions = [
-        -1.0,  1.0,
-        1.0,  1.0,
-        -1.0, -1.0,
-        1.0, -1.0,
-    ];
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-    return{
-        position: positionBuffer
-    };
-}
-function drawScene(gl, shaderProgram, buffers){
-    gl.clearColor(0.0,0.0,0.0,1.0);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    {
-        const vertexPosition = gl.getAttribLocation(shaderProgram,"aVertexPosition");
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-        gl.vertexAttribPointer(vertexPosition,2,gl.FLOAT,false,0,0);
-        gl.enableVertexAttribArray(vertexPosition);
-    }
-    gl.useProgram(shaderProgram);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+function collapseNode(node, gl){
+    const canvas = node.find("#nodeCanvas")[0];
+    const noiseImg = canvas.toDataURL("image/png");
+    gl.gl.deleteProgram(gl.shader);
+    gl.gl.deleteBuffer(gl.buffers.position);
+    node.attr("id", "");
+    $("#nodeCanvas").attr("id", "notNodeCanvas").remove();
+    node.prepend("<div style='background-image:url("+ noiseImg +");width:256px;height:256px;'>");
+    node.find("#seed").attr("id", "notSeed");
+    node.find("#noiseScale").attr("id", "notNoiseScale");
 }
