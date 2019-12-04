@@ -15,7 +15,6 @@ const fsSourcePerlin = `
     uniform lowp vec2 uScreenSize;
     uniform lowp vec4 uSeed;
     uniform lowp float uScale;
-    uniform lowp vec3 uColor;
     
     lowp vec2 random(vec2 st){
         st = vec2( dot(st,vec2(uSeed.x,uSeed.y)),
@@ -43,7 +42,7 @@ const fsSourcePerlin = `
         st.x *= uScreenSize.x/uScreenSize.y;
         lowp vec2 pos = vec2(st*uScale);
         lowp vec3 color = vec3(noise(pos)*.5+.5);
-        color *= uColor;
+        //color *= uColor;
         gl_FragColor = vec4(color, 1.);
     }
 `;
@@ -51,7 +50,6 @@ const fsSourceWorley = `
     uniform lowp vec2 uScreenSize;
     uniform lowp vec4 uSeed;
     uniform lowp float uScale;
-    uniform lowp vec3 uColor;
     
     lowp vec2 random(vec2 p){
         if(p.x == 0. && p.y == 0.){
@@ -84,7 +82,7 @@ const fsSourceWorley = `
         color += m_dist;
         //color += 1. - step(.02, m_dist);
         //color -= step(.7,abs(sin(27.0*m_dist)))*.5;
-        color *= uColor;
+        //color *= uColor;
         gl_FragColor = vec4(color, 1.);
         
     }
@@ -94,7 +92,6 @@ const fsSourceValue = `
     uniform lowp vec2 uScreenSize;
     uniform lowp vec4 uSeed;
     uniform lowp float uScale;
-    uniform lowp vec3 uColor;
     
     lowp float random(vec2 st){
         return fract(sin(dot(st.xy, vec2(uSeed.x,uSeed.y))) * 43758.5453123);
@@ -119,9 +116,8 @@ const fsSourceValue = `
         lowp vec2 pos = vec2(st*uScale);
         lowp float n = valueNoise(pos);
         
-        lowp vec3 color = vec3(n*uColor);
-        
-        gl_FragColor = vec4(color, 1.);
+        //lowp vec3 color = vec3(n*uColor);
+        gl_FragColor = vec4(n,n,n, 1.);
     }
 `;
 

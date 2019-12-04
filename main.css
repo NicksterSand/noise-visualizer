@@ -1,18 +1,13 @@
-#loadWheel{
-    //animation: rotation 2s infinite linear;
-    z-index: 100;
-    width:100%;
-    height:100%;
-    background-image:url("img/load.png");
-    background-repeat:no-repeat;
-    background-position: center;
-}
+
 #loadDiv{
     width:100vw;
     height:100vh;
     position:fixed;
     z-index: 99;
     background-color:black;
+    background-image:url("img/load.png");
+    background-repeat:no-repeat;
+    background-position: center;
 }
 body{margin:0;padding:0;overflow:hidden -moz-hidden-unscrollable;}
 #rightclick{
@@ -89,6 +84,11 @@ main{
 .draggable button:hover{
     background-color: #00e600;
 }
+.draggable button.num{background-color:blue;}
+.draggable button.num:hover{background-color: #5890ff;}
+.draggable img, .draggable .tmpCanvas{
+    margin:0; padding:0; display:inline-block;
+}
 .input{
     right:48px;
     bottom:5px;
@@ -113,35 +113,3 @@ main{
 #controls{
     width:256px;
 }
-/*button{
-    border-radius:5px;
-    padding: 5px;
-    background-color: #eeeeee;
-    font-weight: bold;
-    color:#333333;
-}
-label{
-    float:left;
-    width:30px;
-}
-input[type=range]{
-    margin-left:30px;
-    width:192px;
-}
-#controls{
-    width:256px;
-}
-#draggable{
-    width:256px;
-    padding:12px;
-    border-radius:6px;
-    background-color:lightgrey;
-    box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.45);
-}
-select{
-    width:100px;
-    border-radius:5px;
-    padding:.1em 0;
-    font-size:1em;
-    margin-bottom:10px;
-}*/
